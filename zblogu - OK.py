@@ -15,7 +15,6 @@ ser = serial.Serial(
 #ser.open()
 ser.isOpen()
 
-
 print (ser.isOpen())
 #'Enter your commands below.\r\nInsert "exit" to leave the application.'
 
