@@ -8,6 +8,8 @@ print(dateTimeObj)
 i = 0
 timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
 
+#def measure()
+
 def show_values():
     global portCOM
     global device
@@ -74,6 +76,15 @@ baud_port_list = [115200, 9600]
 variable_drop_baud.set(baud_port_list[0])
 baud_choose = tk.OptionMenu(window, variable_drop_baud, *baud_port_list).grid(row=4, column=1)
 
+### COMMAND TO OTHER DEVICES ###
+
+tk.Label(window, text="ADVANCED").grid(row=5, pady=20, columnspan=4)
+entry_text = tk.StringVar()
+
+tk.Entry(window, text="lol", textvariable=entry_text).grid(row=6)
+
+
+
 
 ### BUTTONS ###
 
@@ -99,7 +110,7 @@ window.mainloop()
 
 #print(interval)
 
-print("lolol", portCOM)
+
 
 # configure the serial connections (the parameters differs on the device you are connecting to)
 ser = serial.Serial(
