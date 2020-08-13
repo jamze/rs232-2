@@ -9,7 +9,7 @@ print(dateTimeObj)
 timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
 
 global running
-running = 0                                     # variable to control measurement loop START 1 / STOP 2
+running = 0                          # variable to control measurement loop START 1 / STOP 2
 
 def show_values():
 
