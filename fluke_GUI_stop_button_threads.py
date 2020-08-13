@@ -16,7 +16,7 @@ ab = 1
 #portCOM=3
 
 def measure():
-    while running:
+    while running == 1:
         # configure the serial connections (the parameters differs on the device you are connecting to)
         ser = serial.Serial(
             port=str(portCOM),
@@ -60,8 +60,10 @@ def measure():
 
                 time.sleep(time_interval)               ## This works well
                 # window.after(1000, measure)
-            if running == 0:
-                break
+                if break_loop == 1:
+                    break
+        if break_loop == 1:
+            break
 
 def show_values():
 
@@ -96,19 +98,24 @@ def show_values():
 def stop_measure():
     global running
     global ab
+    global break_loop
 
     running = 0
     ab = 444
+    # input1="exit"
+    break_loop = 1
 
 def start_measure():
     global running
     global ab
+    global break_loop
 
     running = 1
     ab = 22
 
     t = Thread (target=measure)
     t.start()
+    break_loop = 0
 
     #window.after(1000, measure)
 
