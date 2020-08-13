@@ -20,8 +20,7 @@ def show_values():
     global running
     global command
 
-    ### need to assign values after setting to memory ###
-
+    #running = True
     device = device_check.get()
     portCOM = str("COM%d" %(variable_drop_COM.get()))
     baudrate = int(variable_drop_baud.get())
@@ -41,7 +40,7 @@ def measure():
         ser = serial.Serial(
             port=str(portCOM),
             baudrate=baudrate,
-            timeout=0,                #check how low we can get -> 0 works :D
+            timeout=0,                #check how low we can get
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS
@@ -170,3 +169,4 @@ tk.Button(window, text="3. STOP TEST", command=stop_measure).grid(row=100, colum
 tk.Button(window, text="QUIT", command=quit).grid(row=100, column=3, sticky="nswe")
 
 window.mainloop()
+
