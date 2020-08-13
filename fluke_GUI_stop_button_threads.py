@@ -9,40 +9,14 @@ print(dateTimeObj)
 timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
 time_interval = 1
 
-# def start_measure():
-#     global running
-#     running = True
+global running
+running = 0
 
-def show_values():
-    global portCOM
-    global device
-    global baudrate
-    global time_interval
-    global stop
-
-    stop = 0
-
-    t = Thread(target=measure)
-    t.start()
-
-    device = device_check.get()
-    portCOM = str("COM%d" %(variable_drop_COM.get()))
-    baudrate = int(variable_drop_baud.get())
-    time_interval = int(variable_drop_time.get())
-
-    print("Device: ", device,
-          "\nbaudrate: ", baudrate,
-          "\nCOM", portCOM,
-          "\ntime ", time_interval)
-
-    return device, portCOM, baudrate
-
-def stop_measure():
-    global stop
-    running = 1
+ab = 1
+#portCOM=3
 
 def measure():
-    while True:
+    while running:
         # configure the serial connections (the parameters differs on the device you are connecting to)
         ser = serial.Serial(
             port=str(portCOM),
@@ -84,13 +58,59 @@ def measure():
                     f.write(str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
                     f.close()
 
-                #time.sleep(time_interval)               ## This works well
-                window.after(1000, measure())
+                time.sleep(time_interval)               ## This works well
+                # window.after(1000, measure)
+            if running == 0:
+                break
 
-        if stop == 1:
-            break
+def show_values():
+
+    global portCOM
+    global device
+    global baudrate
+    global time_interval
+    global running
+
+    #running = True
+    device = device_check.get()
+    portCOM = str("COM%d" %(variable_drop_COM.get()))
+    baudrate = int(variable_drop_baud.get())
+    time_interval = int(variable_drop_time.get())
+
+    print("Device: ", device,
+          "\nbaudrate: ", baudrate,
+          "\nCOM", portCOM,
+          "\ntime ", time_interval,
+          "\nrunning: ", running,
+          "\nab: ", ab)
 
 
+# def start_measure():              #### jakies problemy z tym byly, startowalo jako pierwsze zawsze
+#     global running
+#     global ab
+#
+#     #running = 1
+#    # ab = 45
+#     return running, ab
+
+def stop_measure():
+    global running
+    global ab
+
+    running = 0
+    ab = 444
+
+def start_measure():
+    global running
+    global ab
+
+    running = 1
+    ab = 22
+
+    t = Thread (target=measure)
+    t.start()
+
+    #window.after(1000, measure)
 
 ### GUI ###
 
@@ -152,9 +172,10 @@ tk.Entry(window, text="lol", textvariable=entry_text).grid(row=6)
 
 ### BUTTONS ###
 
-tk.Button(window, text="START TEST", command=measure).grid(row=8, column=0)
-tk.Button(window, text="STOP TEST", command=stop_measure).grid(row=8, column=1)
-tk.Button(window, text="CONFIRM", command=show_values).grid(row=8, column=2)
+tk.Button(window, text="1. CONFIRM", command=show_values).grid(row=8, column=0)
+tk.Button(window, text="2. START TEST", command=start_measure).grid(row=8, column=1)
+tk.Button(window, text="3. STOP TEST", command=stop_measure).grid(row=8, column=2)
+tk.Button(window, text="QUIT", command=quit).grid(row=8, column=3)
 
 window.after(1000, measure)
 window.mainloop()
