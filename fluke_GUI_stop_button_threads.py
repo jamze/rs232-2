@@ -2,6 +2,8 @@ import time
 import serial
 from datetime import datetime
 import tkinter as tk
+from tkinter import messagebox
+from tkinter import scrolledtext
 from threading import Thread
 
 dateTimeObj = datetime.now()
@@ -10,6 +12,8 @@ timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
 
 global running
 running = 0                          # variable to control measurement loop START 1 / STOP 2
+confirmed = 0
+
 
 def show_values():
 
@@ -19,6 +23,7 @@ def show_values():
     global time_interval
     global running
     global command
+    global confirmed
 
     ### need to assign values after setting to memory ###
 
@@ -27,6 +32,7 @@ def show_values():
     baudrate = int(variable_drop_baud.get())
     time_interval = float(variable_drop_time.get())-0.1
     command = str(e1.get())
+    confirmed = 1
 
     print("Device: ", device,
           "\nbaudrate: ", baudrate,
@@ -34,6 +40,24 @@ def show_values():
           "\ntime interval ", time_interval,
           "\nrunning: ", running,
           "\nentry: ", command)
+
+
+# def connect():
+#     while connect == 1:
+#             # configure the serial connections (the parameters differs on the device you are connecting to)
+#             ser = serial.Serial(
+#                 port=str(portCOM),
+#                 baudrate=baudrate,
+#                 timeout=0,  # check how low we can get -> 0 works :D
+#                 parity=serial.PARITY_NONE,
+#                 stopbits=serial.STOPBITS_ONE,
+#                 bytesize=serial.EIGHTBITS
+#             )
+#
+#             i = 0
+#
+#             ser.isOpen()
+
 
 def measure():
     while running == 1:
@@ -50,7 +74,9 @@ def measure():
         i = 0
 
         ser.isOpen()
+        # print(ser.isOpen())
 
+        result_window.delete(1.0, tk.END)
         input1 = str(command)
         if input1 == "exit":
             ser.close()
@@ -79,6 +105,8 @@ def measure():
                     f = open("result.csv", "a")
                     print(str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
                     f.write(str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
+                    # results.insert(0, str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
+                    result_window.insert(tk.END, str(i)+", " +timestampStr+","+valuef +", "+valuew +'\n')
                     f.close()
 
                 time.sleep(time_interval)
@@ -97,12 +125,18 @@ def stop_measure():
 def start_measure():
     global running
     global break_loop
+    global confirmed
 
-    running = 1
-    break_loop = 0
+    #running = 1
+    # break_loop = 0
 
-    t = Thread(target=measure)
-    t.start()
+    if confirmed:
+        t = Thread(target=measure)
+        t.start()
+        running = 1
+        break_loop = 0
+    else:
+        messagebox.showinfo("WARNING", "please CONFIRM first")
 
 ### GUI ###
 
@@ -148,7 +182,7 @@ time_choose = tk.OptionMenu(window, variable_drop_time, *time_port_list).grid(ro
 
 tk.Label(window, text="Choose baudrate").grid(row=30, pady=20, sticky="we")
 variable_drop_baud = tk.IntVar()
-baud_port_list = [115200, 9600]
+baud_port_list = [115200, 57600, 38400, 19200, 9600]
 variable_drop_baud.set(baud_port_list[0])
 baud_choose = tk.OptionMenu(window, variable_drop_baud, *baud_port_list).grid(row=30, column=1, sticky="we")
 
@@ -168,5 +202,21 @@ tk.Button(window, text="1. CONFIRM", command=show_values).grid(row=100, column=0
 tk.Button(window, text="2. START TEST", command=start_measure).grid(row=100, column=1, sticky="nswe")
 tk.Button(window, text="3. STOP TEST", command=stop_measure).grid(row=100, column=2, sticky="nswe")
 tk.Button(window, text="QUIT", command=quit).grid(row=100, column=3, sticky="nswe")
+
+### RESULTS ###
+
+tk.Label(window, text="RESULTS", font="bold").grid(row=125, column=0)
+#result_window = tk.Text(window, height=10, width=10) WORK
+result_window = tk.scrolledtext.ScrolledText(window, height=10, width=10)
+result_window.grid(row=126, column=0, columnspan=4, sticky="nswe")
+tk.Scrollbar(window)
+# result_window.insert(tk.END, "test")
+
+## WORKS
+
+# results = tk.Entry(window)
+# results.grid(row=120)
+
+
 
 window.mainloop()

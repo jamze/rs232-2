@@ -1,20 +1,22 @@
 import tkinter as tk
 
-window = tk.Tk()
-window.title('My Window')
-window.geometry('500x300')
+def cbc(id, tex):
+    return lambda : callback(id, tex)
 
-e1 = tk.Entry(window, show=None, font=('Arial', 14))
-e2 = tk.Entry(window, show='*', font=('Arial', 14))
-e1.grid(row=0)
+def callback(id, tex):
+    s = 'At {} f is {}\n'.format(id, id**id/0.987)
+    tex.insert(tk.END, s)
+    tex.see(tk.END)             # Scroll if necessary
 
+top = tk.Tk()
+tex = tk.Text(master=top)
+tex.pack(side=tk.RIGHT)
+bop = tk.Frame()
+bop.pack(side=tk.LEFT)
+for k in range(1,10):
+    tv = 'Say {}'.format(k)
+    b = tk.Button(bop, text=tv, command=cbc(k, tex))
+    b.pack()
 
-def show():
-    global text
-    text = e1.get()
-    print(text)
-
-
-tk.Button(window, command=show).grid(row=1)
-
-window.mainloop()
+tk.Button(bop, text='Exit', command=top.destroy).pack()
+top.mainloop()

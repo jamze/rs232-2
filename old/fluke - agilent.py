@@ -38,7 +38,7 @@ ser.isOpen()
 
 #print (ser.isOpen())  # check comm
 
-f = open("result.csv", "a")
+f = open("../result.csv", "a")
 # print(timestampStr + "," + valuef + '\r')
 f.write("\r"+"TEST START: "+timestampStr+"\n\rtime,value\r")
 f.close()
@@ -75,7 +75,7 @@ while 1:
                 timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
                 i=i+1                           #step
 
-                f = open("result.csv", "a")
+                f = open("../result.csv", "a")
                 print(str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
                 f.write(str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
                 f.close()
