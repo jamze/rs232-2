@@ -40,6 +40,7 @@ def show_values():
           "\nrunning: ", running,
           "\nentry: ", command)
 
+
 # def connect():
 #     while connect == 1:
 #             # configure the serial connections (the parameters differs on the device you are connecting to)
@@ -201,7 +202,7 @@ e1.grid(row=50, columnspan=4, rowspan=4, pady=20, sticky="nswe")
 tk.Button(window, text="1. CONFIRM", command=show_values).grid(row=100, column=0, sticky="nswe")
 tk.Button(window, text="2. START TEST", command=start_measure).grid(row=100, column=1, sticky="nswe")
 tk.Button(window, text="3. STOP TEST", command=stop_measure).grid(row=100, column=2, sticky="nswe")
-tk.Button(window, text="QUIT", command=lambda:[stop_measure(), quit()]).grid(row=100, column=3, sticky="nswe")
+tk.Button(window, text="QUIT", command=quit).grid(row=100, column=3, sticky="nswe")
 
 ### RESULTS ###
 
@@ -209,6 +210,6 @@ tk.Label(window, text="RESULTS", font="bold").grid(row=125, column=0, pady=10, c
 #result_window = tk.Text(window, height=10, width=10) WORK
 result_window = tk.scrolledtext.ScrolledText(window, height=10, width=10)
 result_window.grid(row=126, column=0, columnspan=4, sticky="nswe")
-#tk.Scrollbar(window)
+tk.Scrollbar(window)
 
 window.mainloop()
