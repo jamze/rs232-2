@@ -11,11 +11,11 @@ print(dateTimeObj)
 timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
 
 global running
-running = 0                          # variable to control measurement loop START 1 / STOP 2
+running = 0  # variable to control measurement loop START 1 / STOP 2
 confirmed = 0
 
-def show_values():
 
+def show_values():
     global portCOM
     global device
     global baudrate
@@ -27,9 +27,9 @@ def show_values():
     ### need to assign values after setting to memory ###
 
     device = device_check.get()
-    portCOM = str("COM%d" %(variable_drop_COM.get()))
+    portCOM = str("COM%d" % (variable_drop_COM.get()))
     baudrate = int(variable_drop_baud.get())
-    time_interval = float(variable_drop_time.get())-0.1
+    time_interval = float(variable_drop_time.get()) - 0.1
     command = str(e1.get())
     confirmed = 1
 
@@ -40,22 +40,6 @@ def show_values():
           "\nrunning: ", running,
           "\nentry: ", command)
 
-# def connect():
-#     while connect == 1:
-#             # configure the serial connections (the parameters differs on the device you are connecting to)
-#             ser = serial.Serial(
-#                 port=str(portCOM),
-#                 baudrate=baudrate,
-#                 timeout=0,  # check how low we can get -> 0 works :D
-#                 parity=serial.PARITY_NONE,
-#                 stopbits=serial.STOPBITS_ONE,
-#                 bytesize=serial.EIGHTBITS
-#             )
-#
-#             i = 0
-#
-#             ser.isOpen()
-
 
 def measure():
     try:
@@ -64,18 +48,16 @@ def measure():
             ser = serial.Serial(
                 port=str(portCOM),
                 baudrate=baudrate,
-                timeout=0,                #check how low we can get -> 0 works :D
+                timeout=0,  # check how low we can get -> 0 works :D
                 parity=serial.PARITY_NONE,
                 stopbits=serial.STOPBITS_ONE,
                 bytesize=serial.EIGHTBITS
             )
 
             i = 0
-
             ser.isOpen()
-            # print(ser.isOpen())
-
             result_window.delete(1.0, tk.END)
+
             input1 = str(command)
             if input1 == "exit":
                 ser.close()
@@ -83,40 +65,38 @@ def measure():
             else:
                 while 1:
 
-                    # f = open("../result.csv", "a")
-                    # print(timestampStr + "," + valuef + '\r')
-                    # f.write("\r" + "TEST START: " + timestampStr + "\n\rtime,value\r")
-                    # f.close()
-
                     # send the character to the device
-                    ser.write((input1 + '\r\n').encode())   ## send command to device
+                    ser.write((input1 + '\r\n').encode())  ## send command to device
                     out = ''
                     # let's wait before reading output (let's give device time to answer)
+
                     time.sleep(0.1)
-                    while ser.inWaiting() > 0:             # waiting for response
+                    while ser.inWaiting() > 0:  # waiting for response
                         out = ser.read(99)
 
                     if out != '':
                         string = out.decode()
                         value = string.replace('0\r', ' ')  # stop making 0 after each line
 
-                        valuef = value.split(',')[0]      #delete end of the message (only measurement)
-                        valuew = value.split(',')[1]      #what we are measure(ohm/VAC/VDC)
+                        valuef = value.split(',')[0]  # delete end of the message (only measurement)
+                        valuew = value.split(',')[1]  # what we are measure(ohm/VAC/VDC)
 
                         dateTimeObj = datetime.now()
                         timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
-                        i=i+1                           #step
+                        i = i + 1  # step
 
                         f = open("result.csv", "a")
-                        print(str(i)+", " +timestampStr+","+valuef +", "+valuew +'\r')
-                        f.write(str(i)+", " +timestampStr+","+valuef +", "+valuew +'\r')
+                        print(str(i) + ", " + timestampStr + "," + valuef + ", " + valuew + '\r')
+                        f.write(str(i) + ", " + timestampStr + "," + valuef + ", " + valuew + '\r')
                         # results.insert(0, str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
-                        result_window.insert(tk.END, str(i)+", " +timestampStr+","+valuef +", "+valuew +'\n')
+                        result_window.insert(tk.END, str(i) + ", " + timestampStr + "," + valuef + ", " + valuew + '\n')
                         f.close()
 
                     time.sleep(time_interval)
+
                     if break_loop == 1:
                         break
+
     except:
         messagebox.showinfo("WARNING", "PROBLEM WITH CONNECTION"
                                        "\n\n"
@@ -133,23 +113,34 @@ def stop_measure():
     break_loop = 1
 
     command = "exit"
-    messagebox.showinfo("INFO", "results are also saved in result.csv \n file is located in the main folder")
+    # messagebox.showinfo("INFO", "results are also saved in result.csv \n file is located in the main folder")
+
 
 def start_measure():
     global running
     global break_loop
     global confirmed
 
-    #running = 1
-    # break_loop = 0
-
     if confirmed:
-        t = Thread(target=measure)
-        t.start()
+        # t = Thread(target=measure)   ##work with double click
+        # t.start()
         running = 1
         break_loop = 0
     else:
         messagebox.showinfo("WARNING", "please CONFIRM first")
+
+    t = Thread(target=measure)
+    t.start()
+
+    print("kikniete")
+    print("confirmed", confirmed)
+    print("running", running)
+
+def quit_measure():
+    stop_measure()
+    messagebox.showinfo("INFO", "Measurement saved in main directory in results.csv")
+    window.destroy()
+
 
 ### GUI ###
 
@@ -165,15 +156,15 @@ window.columnconfigure(1, minsize=100)
 window.columnconfigure(2, minsize=100)
 window.columnconfigure(3, minsize=50)
 
-
 ### DEVICE ###
+## NOT USED FOR NOW - planned for default settings ##
 
 tk.Label(window, text="Choose your device").grid(row=5, column=0, pady=20, sticky="nswe")
 device_check = tk.IntVar()
 tk.Radiobutton(window, text="Fluke", variable=device_check, value=1).grid(row=5, column=1)
 tk.Radiobutton(window, text="Agilent", variable=device_check, value=2).grid(row=5, column=2)
 
-            ## Fluke = 1    ## Agilent = 2
+## Fluke = 1    ## Agilent = 2
 
 ### COM ###
 
@@ -207,8 +198,8 @@ tk.Label(window, text="!!! If you are not sure "
 tk.Label(window, text="put here your own command to the device").grid(row=42, columnspan=4, pady=(0, 0))
 entry_text = tk.StringVar()
 
-e1 = tk.Entry(window,textvariable=entry_text)
-e1.insert(0,"qm")
+e1 = tk.Entry(window, textvariable=entry_text)
+e1.insert(0, "qm")
 e1.grid(row=50, columnspan=4, rowspan=4, pady=20, sticky="nswe")
 
 ### BUTTONS ###
@@ -216,14 +207,13 @@ e1.grid(row=50, columnspan=4, rowspan=4, pady=20, sticky="nswe")
 tk.Button(window, text="1. CONFIRM", command=show_values).grid(row=100, column=0, sticky="nswe")
 tk.Button(window, text="2. START TEST", command=start_measure).grid(row=100, column=1, sticky="nswe")
 tk.Button(window, text="3. STOP TEST", command=stop_measure).grid(row=100, column=2, sticky="nswe")
-tk.Button(window, text="QUIT", command=lambda:[stop_measure(), window.destroy()]).grid(row=100, column=3, sticky="nswe")
+tk.Button(window, text="QUIT", command=quit_measure).grid(row=100, column=3,sticky="nswe")
 
 ### RESULTS ###
 
 tk.Label(window, text="RESULTS", font="bold").grid(row=125, column=0, pady=10, columnspan=4, sticky="nswe")
-#result_window = tk.Text(window, height=10, width=10) WORK
 result_window = tk.scrolledtext.ScrolledText(window, height=10, width=10)
 result_window.grid(row=126, column=0, columnspan=4, sticky="nswe")
-#tk.Scrollbar(window)
 
+tk.Label(window, text="test, 2020", font=("Calibri", 6)).grid(column=3, sticky="e")
 window.mainloop()
