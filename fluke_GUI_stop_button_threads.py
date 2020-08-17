@@ -58,58 +58,66 @@ def show_values():
 
 
 def measure():
-    while running == 1:
-        # configure the serial connections (the parameters differs on the device you are connecting to)
-        ser = serial.Serial(
-            port=str(portCOM),
-            baudrate=baudrate,
-            timeout=0,                #check how low we can get -> 0 works :D
-            parity=serial.PARITY_NONE,
-            stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS
-        )
+    try:
+        while running == 1:
+            # configure the serial connections (the parameters differs on the device you are connecting to)
+            ser = serial.Serial(
+                port=str(portCOM),
+                baudrate=baudrate,
+                timeout=0,                #check how low we can get -> 0 works :D
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                bytesize=serial.EIGHTBITS
+            )
 
-        i = 0
+            i = 0
 
-        ser.isOpen()
-        # print(ser.isOpen())
+            ser.isOpen()
+            # print(ser.isOpen())
 
-        result_window.delete(1.0, tk.END)
-        input1 = str(command)
-        if input1 == "exit":
-            ser.close()
-            exit()
-        else:
-            while 1:
-                # send the character to the device
-                ser.write((input1 + '\r\n').encode())   ## send command to device
-                out = ''
-                # let's wait before reading output (let's give device time to answer)
-                time.sleep(0.1)
-                while ser.inWaiting() > 0:             # waiting for response
-                    out = ser.read(99)
+            result_window.delete(1.0, tk.END)
+            input1 = str(command)
+            if input1 == "exit":
+                ser.close()
+                exit()
+            else:
+                while 1:
+                    # send the character to the device
+                    ser.write((input1 + '\r\n').encode())   ## send command to device
+                    out = ''
+                    # let's wait before reading output (let's give device time to answer)
+                    time.sleep(0.1)
+                    while ser.inWaiting() > 0:             # waiting for response
+                        out = ser.read(99)
 
-                if out != '':
-                    string = out.decode()
-                    value = string.replace('0\r', ' ')  # stop making 0 after each line
+                    if out != '':
+                        string = out.decode()
+                        value = string.replace('0\r', ' ')  # stop making 0 after each line
 
-                    valuef = value.split(',')[0]      #delete end of the message (only measurement)
-                    valuew = value.split(',')[1]      #what we are measure(ohm/VAC/VDC)
+                        valuef = value.split(',')[0]      #delete end of the message (only measurement)
+                        valuew = value.split(',')[1]      #what we are measure(ohm/VAC/VDC)
 
-                    dateTimeObj = datetime.now()
-                    timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
-                    i=i+1                           #step
+                        dateTimeObj = datetime.now()
+                        timestampStr = dateTimeObj.strftime("%d-%b-%Y %H:%M:%S.%f")
+                        i=i+1                           #step
 
-                    f = open("result.csv", "a")
-                    print(str(i)+", " +timestampStr+","+valuef +", "+valuew +'\r')
-                    f.write(str(i)+", " +timestampStr+","+valuef +", "+valuew +'\r')
-                    # results.insert(0, str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
-                    result_window.insert(tk.END, str(i)+", " +timestampStr+","+valuef +", "+valuew +'\n')
-                    f.close()
+                        f = open("result.csv", "a")
+                        print(str(i)+", " +timestampStr+","+valuef +", "+valuew +'\r')
+                        f.write(str(i)+", " +timestampStr+","+valuef +", "+valuew +'\r')
+                        # results.insert(0, str(i)+"," +timestampStr+","+valuef +","+valuew +'\r')
+                        result_window.insert(tk.END, str(i)+", " +timestampStr+","+valuef +", "+valuew +'\n')
+                        f.close()
 
-                time.sleep(time_interval)
-                if break_loop == 1:
-                    break
+                    time.sleep(time_interval)
+                    if break_loop == 1:
+                        break
+    except:
+        messagebox.showinfo("WARNING", "PROBLEM WITH CONNECTION"
+                                       "\n\n"
+                                       "\nPlease check:\n"
+                                       "\n- Device is connected"
+                                       "\n- Proper settings are set (port COM/ baudrate)")
+
 
 def stop_measure():
     global running
